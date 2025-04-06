@@ -54,7 +54,7 @@ sudo apt install git -y
 2. 克隆此倉庫：
 
 ```bash
-git clone https://github.com/jcode0x378/ubuntu-apache-setup.git
+git clone https://github.com/ken87085/ubuntu.git
 ```
 
 3. 進入項目目錄並啟動安裝腳本：
