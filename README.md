@@ -22,7 +22,7 @@
 
 ## 安裝步驟
 
-1. 克隆或下載此專案到您的 Ubuntu 系統
+1. 複製或下載此專案到您的 Ubuntu 系統
 
 ```bash
 git clone https://github.com/yourusername/ubuntu.git
