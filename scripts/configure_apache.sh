@@ -32,11 +32,6 @@ if [ ! -f "$(pwd)/configs/apache/sites-available/000-default.conf" ]; then
     sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html|g' "$(pwd)/configs/apache/sites-available/000-default.conf"
 fi
 
-# 複製項目配置文件
-echo "應用項目配置文件..."
-cp "$(pwd)/configs/apache/apache2.conf" /etc/apache2/apache2.conf
-cp "$(pwd)/configs/apache/sites-available/000-default.conf" /etc/apache2/sites-available/000-default.conf
-
 # 複製網站文件
 echo "複製網站文件..."
 if [ ! -f "$(pwd)/web/index.html" ]; then
@@ -125,21 +120,46 @@ echo "設置文件權限..."
 chown -R www-data:www-data /var/www/html/
 chmod -R 755 /var/www/html/
 
-# 啟用必要的模組
+# 啟用必要的模組（使用 a2enmod 而不是手動加載）
 echo "啟用必要的 Apache 模組..."
 a2enmod rewrite
 a2enmod ssl
 a2enmod headers
 
+# 應用配置文件（僅包含必要的設定）
+echo "應用項目配置文件..."
+# 僅修改部分安全配置，不完全覆蓋配置文件
+echo "# 安全優化設置" >> /etc/apache2/apache2.conf
+echo "ServerTokens Prod" >> /etc/apache2/apache2.conf
+echo "ServerSignature Off" >> /etc/apache2/apache2.conf
+echo "TraceEnable Off" >> /etc/apache2/apache2.conf
+
+# 修改默認站點配置
+cp "$(pwd)/configs/apache/sites-available/000-default.conf" /etc/apache2/sites-available/000-default.conf
+
 # 重啟 Apache 以應用配置
 echo "重啟 Apache 服務以應用配置..."
 systemctl restart apache2
 
-# 檢查配置是否正確
-if ! apache2ctl configtest; then
-    echo "Apache 配置測試失敗，請檢查配置文件"
-    exit 1
+# 檢查重啟是否成功
+if ! systemctl is-active apache2 >/dev/null; then
+    echo "警告：Apache 服務未正常啟動，嘗試修復..."
+    # 還原配置並重啟
+    if [ -f /etc/apache2/apache2.conf.backup ]; then
+        cp /etc/apache2/apache2.conf.backup /etc/apache2/apache2.conf
+    fi
+    systemctl restart apache2
+    
+    if ! systemctl is-active apache2 >/dev/null; then
+        echo "Apache 重啟失敗，請手動檢查配置"
+        exit 1
+    else
+        echo "成功還原並重啟 Apache 服務"
+    fi
 fi
+
+# 檢查配置是否正確
+apache2ctl configtest
 
 echo "==== Apache 配置完成 ===="
 exit 0 

@@ -30,11 +30,66 @@ else
     echo "本地 IP 地址設置正確：$IP_ADDRESS"
 fi
 
+# 診斷網絡問題
+echo "執行網絡診斷..."
+# 檢查 Apache 是否監聽 80 端口
+if netstat -tulpn | grep :80 > /dev/null; then
+    echo "Apache 正確監聽 80 端口"
+else
+    echo "警告：Apache 未監聽 80 端口"
+    echo "正在嘗試重新啟動 Apache..."
+    systemctl restart apache2
+fi
+
+# 檢查防火牆是否允許 80 端口
+if ufw status | grep "80/tcp" | grep "ALLOW" > /dev/null; then
+    echo "防火牆已允許 80 端口訪問"
+else
+    echo "警告：防火牆可能阻止了 80 端口訪問"
+    echo "嘗試開放防火牆端口..."
+    ufw allow 80/tcp
+fi
+
 # 顯示網絡設置建議
+echo ""
+echo "============================================================"
 echo "網絡設置建議："
-echo "- 確保虛擬機網絡設置為橋接模式或 NAT 模式以允許從宿主機訪問"
-echo "- 如果使用 VirtualBox，建議設置為橋接網卡模式"
-echo "- 如果使用 VMware，建議使用 NAT 或橋接模式"
+echo "============================================================"
+echo "1. VirtualBox 網絡設置："
+echo "   - 目前檢測到的 IP 地址：$IP_ADDRESS"
+echo "   - 確保使用橋接網卡模式(Bridged Adapter)，這樣虛擬機能夠直接連接到實體網絡"
+echo "   - 在 VirtualBox 設置中，選擇：設備 > 網絡 > 網卡1 > 使用方式：橋接網卡"
+echo ""
+echo "2. 檢查主機防火牆："
+echo "   - 確保主機防火牆允許虛擬機 IP ($IP_ADDRESS) 的連接"
+echo "   - Windows：檢查 Windows Defender 防火牆設置"
+echo "   - Mac/Linux：檢查系統防火牆設置"
+echo ""
+echo "3. 啟用主機與虛擬機間的複製貼上功能："
+echo "   - VirtualBox：設備 > 共用剪貼簿 > 雙向"
+echo "   - VirtualBox：設備 > 拖放 > 雙向"
+echo "   - 安裝增強功能：設備 > 安裝增強功能 (Guest Additions)"
+echo "     安裝指令："
+echo "     sudo apt update"
+echo "     sudo apt install -y build-essential dkms linux-headers-\$(uname -r)"
+echo "     sudo mount /dev/cdrom /mnt"
+echo "     sudo sh /mnt/VBoxLinuxAdditions.run"
+echo "     sudo reboot"
+echo ""
+echo "4. 測試連接："
+echo "   - 從主機系統使用瀏覽器訪問：http://$IP_ADDRESS"
+echo "   - 如果無法連接，請先嘗試從虛擬機內部訪問：curl http://localhost"
+echo "============================================================"
+
+# 測試 Apache 服務
+echo "測試 Apache 連接..."
+if curl -s --head http://localhost | grep "200 OK" > /dev/null; then
+    echo "Apache 服務運行正常，可從本機訪問"
+else
+    echo "警告：無法訪問 Apache 本地服務"
+    echo "檢查 Apache 狀態..."
+    systemctl status apache2
+fi
 
 # 顯示訪問信息
 echo "網站訪問信息："

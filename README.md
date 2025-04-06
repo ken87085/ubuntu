@@ -1,3 +1,5 @@
+# 版本: V1.0
+
 # Ubuntu Apache 自動化部署項目
 
 這個項目提供了在 Ubuntu 虛擬機中自動部署 Apache 網頁伺服器的完整解決方案，確保伺服器配置正確並可從宿主機訪問。
@@ -10,6 +12,7 @@
 - 安全設置與優化
 - 網絡配置，確保從實體機可訪問虛擬機中的網頁
 - 完整的自動化部署流程，最小化人工干預
+- 實現虛擬機與宿主機之間的複製貼上功能
 
 ## 項目結構
 
@@ -20,7 +23,8 @@
 │   ├── install_apache.sh     # Apache 安裝腳本
 │   ├── configure_apache.sh   # Apache 配置腳本
 │   ├── setup_firewall.sh     # 防火牆設置腳本
-│   └── network_config.sh     # 網絡配置腳本
+│   ├── network_config.sh     # 網絡配置腳本
+│   └── fix_apache.sh         # Apache 修復腳本
 ├── configs/                  # 配置文件目錄
 │   ├── apache/               # Apache 配置文件
 │   │   ├── apache2.conf      # Apache 主配置文件
@@ -57,8 +61,8 @@ git clone https://github.com/jcode0x378/ubuntu-apache-setup.git
 
 ```bash
 cd ubuntu-apache-setup
-chmod +x setup.sh
-./setup.sh
+chmod +x setup.sh scripts/*.sh
+sudo ./setup.sh
 ```
 
 4. 按照腳本提示完成配置
@@ -78,6 +82,77 @@ sudo systemctl status apache2
 ```
 http://[虛擬機IP地址]
 ```
+
+## 啟用複製貼上功能
+
+本專案支援在虛擬機和宿主機之間啟用複製貼上功能，有兩種方式：
+
+### 方式一：使用腳本安裝 Guest Additions
+
+在運行 `setup.sh` 時，會詢問是否安裝 VirtualBox Guest Additions 以啟用複製貼上功能。選擇 'y' 將自動進行安裝。
+
+### 方式二：手動設置
+
+1. 在 VirtualBox 菜單中選擇：「設備」>「共用剪貼簿」>「雙向」
+2. 在 VirtualBox 菜單中選擇：「設備」>「拖放」>「雙向」
+3. 安裝 Guest Additions：
+   ```bash
+   sudo apt update
+   sudo apt install -y build-essential dkms linux-headers-$(uname -r)
+   # 插入 Guest Additions CD
+   sudo mount /dev/cdrom /mnt
+   sudo sh /mnt/VBoxLinuxAdditions.run
+   sudo reboot
+   ```
+
+## 網絡連接問題解決
+
+如果無法從宿主機連接到虛擬機的 Apache 服務器，請嘗試以下步驟：
+
+### 1. 確認 VirtualBox 網絡設定
+
+將虛擬機網絡模式設置為「橋接網卡」：
+- 關閉虛擬機
+- 在 VirtualBox 主界面：選擇虛擬機 > 設定 > 網絡
+- 將「連接方式」設置為「橋接網卡」
+- 選擇正確的實體網卡（通常是連接到網路的那個）
+- 重新啟動虛擬機
+
+### 2. 運行修復腳本
+
+如果 Apache 服務存在問題，可以運行修復腳本：
+
+```bash
+sudo ./scripts/fix_apache.sh
+```
+
+### 3. 檢查防火牆設置
+
+確保防火牆允許 HTTP 和 HTTPS 通信：
+
+```bash
+sudo ufw status
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+```
+
+### 4. 檢查實體機防火牆
+
+請確保宿主機的防火牆未阻止來自虛擬機 IP 的連接。
+
+## 常見問題解答
+
+### Q: 無法從宿主機訪問虛擬機網頁？
+A: 確保虛擬機使用橋接網卡模式，並且 Apache 服務正常運行。可以運行 `./scripts/fix_apache.sh` 來修復 Apache 服務。
+
+### Q: 虛擬機中無法使用複製貼上功能？
+A: 安裝 VirtualBox Guest Additions 並在 VirtualBox 設置中開啟「共用剪貼簿」選項設為「雙向」。
+
+### Q: Apache 服務啟動失敗？
+A: 檢查配置文件是否有錯誤，運行 `sudo apache2ctl configtest` 查看具體錯誤信息，或使用修復腳本 `sudo ./scripts/fix_apache.sh`。
+
+### Q: 虛擬機的 IP 地址是什麼？
+A: 在虛擬機中運行 `hostname -I` 獲取 IP 地址。
 
 ## 故障排除
 
@@ -101,4 +176,9 @@ sudo ufw status
 4. 確認網絡連接：
 ```bash
 ip addr show
+```
+
+5. 測試本地連接：
+```bash
+curl -v http://localhost
 ``` 
