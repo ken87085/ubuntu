@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3311231004</title>
+    <meta charset="UTF-8">
     <style>
         body {
-            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            font-family: Arial, sans-serif;
             line-height: 1.6;
             margin: 0;
             padding: 0;
@@ -29,10 +28,6 @@
             color: #4CAF50;
             text-align: center;
         }
-        h2 {
-            color: #2196F3;
-            margin-top: 20px;
-        }
         p {
             margin-bottom: 10px;
         }
@@ -48,57 +43,48 @@
             border-radius: 5px;
             margin-top: 20px;
         }
-        .code-block {
-            background: #f1f1f1;
-            padding: 10px;
-            border-radius: 3px;
-            font-family: monospace;
+        .links {
+            margin-top: 30px;
+            text-align: center;
         }
-        .steps {
-            margin-top: 20px;
+        .links a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s;
         }
-        .steps li {
-            margin-bottom: 10px;
+        .links a:hover {
+            background: #3e8e41;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="success-icon">✓</div>
-        <h1>Apache 伺服器部署成功！</h1>
-        <p>恭喜！您已成功配置並啟動 Apache 網頁伺服器。這個頁面確認您的伺服器正在正確運行。</p>
+        <h1>XD</h1>
+        <p>666666</p>
         
         <div class="server-info">
             <h2>伺服器資訊</h2>
             <p><strong>伺服器地址：</strong> <span id="server-ip">Loading...</span></p>
             <p><strong>作業系統：</strong> Ubuntu</p>
             <p><strong>Web 伺服器：</strong> Apache</p>
+            <p><strong>資料庫：</strong> MariaDB</p>
+            <p><strong>腳本版本：</strong> 1.0</p>
             <p><strong>部署時間：</strong> <span id="deploy-time">Loading...</span></p>
         </div>
         
-        <h2>下一步</h2>
-        <p>您可以開始將您的網站內容放在 <code>/var/www/html</code> 目錄中來替換這個頁面。</p>
-        
-        <div class="steps">
-            <h3>常用 Apache 指令：</h3>
-            <ul>
-                <li>啟動 Apache：<div class="code-block">sudo systemctl start apache2</div></li>
-                <li>停止 Apache：<div class="code-block">sudo systemctl stop apache2</div></li>
-                <li>重啟 Apache：<div class="code-block">sudo systemctl restart apache2</div></li>
-                <li>檢查 Apache 狀態：<div class="code-block">sudo systemctl status apache2</div></li>
-                <li>檢查配置文件語法：<div class="code-block">sudo apache2ctl configtest</div></li>
-                <li>查看錯誤日誌：<div class="code-block">sudo tail -f /var/log/apache2/error.log</div></li>
-            </ul>
+        <div class="links">
+            <a href="/admin.php">管理頁面</a>
+            <a href="/phpmyadmin">phpMyAdmin</a>
+            <a href="/db-test.php">資料庫測試</a>
         </div>
         
-        <div class="steps">
-            <h3>安全提示：</h3>
-            <ul>
-                <li>定期更新系統：<div class="code-block">sudo apt update && sudo apt upgrade -y</div></li>
-                <li>檢查 Apache 運行狀態：<div class="code-block">sudo systemctl status apache2</div></li>
-                <li>檢查防火牆狀態：<div class="code-block">sudo ufw status</div></li>
-            </ul>
-        </div>
+        <p style="margin-top: 30px; text-align: center;">您可以開始將您的網站內容放在 <code>/var/www/html</code> 目錄中來替換這個頁面。</p>
     </div>
 
     <script>
@@ -106,7 +92,7 @@
         document.getElementById('server-ip').innerText = window.location.hostname;
         
         // 設置部署時間
-        document.getElementById('deploy-time').innerText = new Date().toLocaleString('zh-TW');
+        document.getElementById('deploy-time').innerText = new Date().toLocaleString();
     </script>
 </body>
 </html> 
